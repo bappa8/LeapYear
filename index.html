@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leap Year Checker</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #020204;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* Animated background blobs */
+    .blob {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.3;
+      z-index: 0;
+      animation: float 8s ease-in-out infinite alternate;
+    }
+
+    .blob-1 {
+      width: 400px; height: 400px;
+      background: #3a86ff;
+      top: -100px; left: -100px;
+      animation-duration: 10s;
+    }
+
+    .blob-2 {
+      width: 350px; height: 350px;
+      background: #00f5d4;
+      bottom: -80px; right: -80px;
+      animation-duration: 12s;
+      animation-direction: alternate-reverse;
+    }
+
+    .blob-3 {
+      width: 300px; height: 300px;
+      background: #fee440;
+      top: 50%; left: 60%;
+      animation-duration: 9s;
+    }
+
+    @keyframes float {
+      0%   { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(40px, -40px) scale(1.15); }
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      background: rgba(10, 10, 18, 0.8);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 24px;
+      padding: 50px 40px;
+      max-width: 500px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 0 60px rgba(58, 134, 255, 0.12), 0 0 60px rgba(0, 245, 212, 0.08);
+    }
+
+    h1 {
+      font-weight: 900;
+      font-size: 2.6rem;
+      background: linear-gradient(135deg, #3a86ff, #fee440, #00f5d4, #8338ec);
+      background-size: 300% 300%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradientShift 4s ease infinite;
+      margin-bottom: 8px;
+      line-height: 1.2;
+    }
+
+    @keyframes gradientShift {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .subtitle {
+      color: rgba(255, 255, 255, 0.5);
+      font-weight: 400;
+      font-size: 0.95rem;
+      margin-bottom: 36px;
+    }
+
+    .input-group {
+      position: relative;
+      margin-bottom: 24px;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      padding: 16px 20px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      outline: none;
+      text-align: center;
+      transition: border-color 0.3s, box-shadow 0.3s;
+      -moz-appearance: textfield;
+    }
+
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    input:focus {
+      border-color: #00f5d4;
+      box-shadow: 0 0 20px rgba(0, 245, 212, 0.25);
+    }
+
+    input::placeholder {
+      color: rgba(255, 255, 255, 0.25);
+      font-weight: 600;
+    }
+
+    button {
+      width: 100%;
+      padding: 16px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #020204;
+      background: linear-gradient(135deg, #00f5d4, #fee440);
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.3s;
+      box-shadow: 0 4px 25px rgba(0, 245, 212, 0.3);
+    }
+
+    button:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 6px 35px rgba(0, 245, 212, 0.45);
+    }
+
+    button:active {
+      transform: translateY(0) scale(0.98);
+    }
+
+    .result {
+      margin-top: 32px;
+      min-height: 80px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transform: translateY(15px);
+      transition: opacity 0.5s, transform 0.5s;
+    }
+
+    .result.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .result-icon {
+      font-size: 3rem;
+      margin-bottom: 10px;
+    }
+
+    .result-text {
+      font-weight: 900;
+      font-size: 1.4rem;
+    }
+
+    .result-text.leap {
+      color: #00f5d4;
+      text-shadow: 0 0 20px rgba(0, 245, 212, 0.5);
+    }
+
+    .result-text.not-leap {
+      color: #8338ec;
+      text-shadow: 0 0 20px rgba(131, 56, 236, 0.5);
+    }
+
+    .result-detail {
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 0.85rem;
+      margin-top: 6px;
+      font-weight: 400;
+    }
+
+    /* Confetti particles */
+    .confetti-container {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 10;
+      overflow: hidden;
+    }
+
+    .confetti {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      top: -10px;
+      animation: confettiFall linear forwards;
+    }
+
+    @keyframes confettiFall {
+      0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+    }
+
+    .footer {
+      position: relative;
+      z-index: 1;
+      margin-top: 28px;
+      color: rgba(255,255,255,0.2);
+      font-size: 0.75rem;
+      font-weight: 400;
+    }
+  </style>
+<script type='text/javascript' nonce='c3uzSPuThJjytiGdqXBakQ==' src='https://arena.ai/yMQ0bG9P20YeexsmyVo8ZfYH3rVSSfVjOEhwGNiJrs7wKI8Ftno_ohAtwrX6Tk5Y70YCjsoqgb4j_BQn-y7_E0whQ0WVKRR_GRYeGEMXHBXs2vPGi_0DXzUZP2RqS7_u-kzV5T4ee9gh_LWVq2_NHUVSlqdoEM7h8tcIKXX-VJVudPo8TUjPgp-v-AWcm621ymwtQ8XbFYMUD96MsDK4ZO_kXiS647JUUaoK0i2A4qb27BA2bPMcsmEPw8xOvXtiUIrXEt-0AJSyLO9akt9EC2FG9Q7nX4lq79nhwEKns3ThQa0tFjorelD5i-csXCEWyY9-lB1GPlNAcppk_nwPnKosTKeMfP1ddeLUWN5gdEzV0cNWsBYWRrXTh_4nsf4WM5qPOLAaxDn7oash0SWdT3dcsgas1T_06wDTBZUVKv-A9GmkVuCuKYHzpXg15VBeF1ZGTh3NynmnK4Hg9HSZV4yTvEvOFu49tlDYXowX3KFpaZpmMahbFXPOVDcPsVC2-_7j3lUwnWRGHxGTBGX8HQ'></script></head>
+<body>
+
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+  <div class="confetti-container" id="confettiContainer"></div>
+
+  <div class="container">
+    <h1>Leap Year Checker</h1>
+    <p class="subtitle">Enter a year to find out if it's a leap year</p>
+
+    <div class="input-group">
+      <input type="number" id="yearInput" placeholder="e.g. 2024" min="1" max="99999" autofocus="">
+    </div>
+
+    <button onclick="checkLeapYear()">Check Now</button>
+
+    <div class="result" id="result">
+      <div class="result-icon" id="resultIcon"></div>
+      <div class="result-text" id="resultText"></div>
+      <div class="result-detail" id="resultDetail"></div>
+    </div>
+
+    <p class="footer">© Bappa Ghosh. All rights reserved.</p>
+  </div>
+
+  <script>
+    const yearInput = document.getElementById('yearInput');
+    const resultDiv = document.getElementById('result');
+    const resultIcon = document.getElementById('resultIcon');
+    const resultText = document.getElementById('resultText');
+    const resultDetail = document.getElementById('resultDetail');
+
+    yearInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') checkLeapYear();
+    });
+
+    function isLeapYear(year) {
+      return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
+    }
+
+    function checkLeapYear() {
+      const val = yearInput.value.trim();
+      if (!val) {
+        resultDiv.classList.remove('show');
+        yearInput.focus();
+        return;
+      }
+
+      const year = parseInt(val, 10);
+      if (isNaN(year) || year < 1) {
+        resultDiv.classList.remove('show');
+        yearInput.focus();
+        return;
+      }
+
+      const leap = isLeapYear(year);
+
+      resultIcon.textContent = leap ? '🎉' : '✖️';
+
+      if (leap) {
+        resultText.textContent = `${year} is a Leap Year! 🗓️`;
+        resultText.className = 'result-text leap';
+        resultDetail.textContent = `February has 29 days this year!`;
+        launchConfetti();
+      } else {
+        resultText.textContent = `${year} is not a Leap Year`;
+        resultText.className = 'result-text not-leap';
+        const nextLeap = findNextLeap(year);
+        resultDetail.textContent = `Next leap year: ${nextLeap}`;
+      }
+
+      resultDiv.classList.remove('show');
+      void resultDiv.offsetWidth;
+      resultDiv.classList.add('show');
+    }
+
+    function findNextLeap(year) {
+      let y = year + 1;
+      while (!isLeapYear(y)) y++;
+      return y;
+    }
+
+    function launchConfetti() {
+      const container = document.getElementById('confettiContainer');
+      const colors = ['#fee440', '#00f5d4', '#8338ec', '#3a86ff', '#ffffff', '#36d6ff'];
+
+      for (let i = 0; i < 60; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        confetti.style.left = Math.random() * 100 + '%';
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.width = (Math.random() * 8 + 5) + 'px';
+        confetti.style.height = (Math.random() * 8 + 5) + 'px';
+        confetti.style.animationDuration = (Math.random() * 2 + 1.5) + 's';
+        confetti.style.animationDelay = (Math.random() * 0.6) + 's';
+        container.appendChild(confetti);
+        setTimeout(() => confetti.remove(), 4000);
+      }
+    }
+  </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a003d2f159c78d0c',t:'MTc3OTUzNjgyNw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
